@@ -52,8 +52,13 @@
 
               cp -r . "$out/lib/redline"
 
+              # Skip bin/redline.cjs: that launcher exists to locate Bun on
+              # PATH, which a Nix closure does not have. Run the CLI with the
+              # pinned Bun directly and set the env var the launcher would have.
               makeWrapper ${pkgs.bun}/bin/bun "$out/bin/redline" \
-                --add-flags "$out/lib/redline/bin/redline.cjs"
+                --add-flags "run" \
+                --add-flags "$out/lib/redline/src/cli.ts" \
+                --set REDLINE_BIN_ABS "$out/bin/redline"
 
               runHook postInstall
             '';
